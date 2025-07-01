@@ -15,7 +15,6 @@ app.get('/generate', async (req, res) => {
   try {
     const mailData = await readMailData(directory);
     const mailtoLink = generateMailtoLink(mailData);
-    console.log(mailtoLink);
 
     res.send(`<a href="${mailtoLink}">mailto</a>`);
   } catch (error) {
