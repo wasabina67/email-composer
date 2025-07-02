@@ -34,11 +34,11 @@ async function readMailData(directory) {
 function generateMailtoLink(mailData) {
   const to = mailData.to.map(email => encodeURIComponent(email)).join(',');
 
-  const params = new URLSearchParams();
-  if (mailData.cc.length > 0) params.append('cc', mailData.cc.join(','));
-  if (mailData.subject) params.append('subject', mailData.subject);
-  if (mailData.body) params.append('body', mailData.body);
-  const queryString = params.toString();
+  const params = [];
+  if (mailData.cc.length > 0) params.push(`cc=${encodeURIComponent(mailData.cc.join(','))}`);
+  if (mailData.subject) params.push(`subject=${encodeURIComponent(mailData.subject)}`);
+  if (mailData.body) params.push(`body=${encodeURIComponent(mailData.body)}`);
+  const queryString = params.join('&');
 
   return `mailto:${to}${queryString ? '?' + queryString : ''}`;
 }
