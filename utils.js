@@ -33,13 +33,30 @@ async function readMailData(directory) {
 
 function generateMailtoLink(mailData) {
   const to = mailData.to.map(email => encodeURIComponent(email)).join(',');
+  const MAX_URL_LENGTH = 2000; // Conservative limit for email client compatibility
 
   const params = [];
   if (mailData.cc.length > 0) params.push(`cc=${encodeURIComponent(mailData.cc.join(','))}`);
   if (mailData.subject) params.push(`subject=${encodeURIComponent(mailData.subject)}`);
-  if (mailData.body) params.push(`body=${encodeURIComponent(mailData.body)}`);
+  
+  // Calculate base URL length without body
+  const baseUrl = `mailto:${to}`;
+  const baseParams = params.join('&');
+  const baseLength = baseUrl.length + (baseParams ? 1 + baseParams.length : 0); // +1 for '?'
+  
+  // Add body only if it fits within the URL length limit
+  if (mailData.body) {
+    const encodedBody = encodeURIComponent(mailData.body);
+    const bodyParam = `body=${encodedBody}`;
+    const totalLength = baseLength + (params.length > 0 ? 1 : 0) + bodyParam.length; // +1 for '&'
+    
+    if (totalLength <= MAX_URL_LENGTH) {
+      params.push(bodyParam);
+    }
+    // If body is too long, it will be omitted from the mailto link
+  }
+  
   const queryString = params.join('&');
-
   return `mailto:${to}${queryString ? '?' + queryString : ''}`;
 }
 
